@@ -6,10 +6,22 @@ pr:
     exclude:
       - feature/*
 
+strategy:
+  matrix:
+    dotnet-8.0.0:
+      vesrion: '8.0.200'
+    dotnet-8.0.1:
+      vesrion: '8.0.201'
+
 pool:
   vmImage: ubuntu-latest
 
 steps:
+  - task: UseDotNet@2
+    inputs:
+      version: '$(vesrion)'
+      installationPath: $(Agent.ToolsDirectory)/dotnet
+      
   - task: DotNetCoreCLI@2
     displayName: Testes
     inputs:
@@ -23,3 +35,4 @@ steps:
       testResultsFormat: 'XUnit'
       testResultsFiles: '*.trx'
       searchFolder: '$(Agent.TempDirectory)'
+      testRunTitle: 'Testes da versão $(vesrion)'
