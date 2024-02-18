@@ -1,5 +1,8 @@
 name: ci-dotnet-workflow
 on: [push]
+permissions:
+  checks: write
+  pull-requests: write
 jobs:
   check-application:
     runs-on: ubuntu-latest
@@ -8,11 +11,11 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0'
-      - run: dotnet test tests/unitTests/unitTests.csproj
+      - run: dotnet test tests/unitTests/unitTests.csproj --logger trx --results-directory test-results
 
       - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action/composite@v2
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: |
-            **/*.trx
+            test-results/*.trx
