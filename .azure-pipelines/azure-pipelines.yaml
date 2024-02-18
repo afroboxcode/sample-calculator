@@ -6,21 +6,21 @@ pr:
     exclude:
       - feature/*
 
-strategy:
-  matrix:
-    dotnet-8.0.0:
-      vesrion: '8.0.200'
-    dotnet-8.0.1:
-      vesrion: '8.0.201'
+# strategy:
+#   matrix:
+#     dotnet-8.0.0:
+#       vesrion: '8.0.200'
+#     dotnet-8.0.1:
+#       vesrion: '8.0.201'
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-  - task: UseDotNet@2
-    inputs:
-      version: '$(vesrion)'
-      installationPath: $(Agent.ToolsDirectory)/dotnet
+  # - task: UseDotNet@2
+    # inputs:
+    #   version: '$(vesrion)'
+    #   installationPath: $(Agent.ToolsDirectory)/dotnet
       
   - task: DotNetCoreCLI@2
     displayName: Testes
@@ -28,6 +28,16 @@ steps:
       command: 'test'
       projects: 'tests/unitTests/unitTests.csproj'
       workingDirectory: '$(Pipeline.Workspace)'
+
+  - task: Docker@2
+    inputs:
+      command: buildAndPush
+      containerRegistry: 'dockerhub'
+      Dockerfile: '**/Dockerfile'
+      repository: 'afroboxcode/calculator-azurepipeline'
+      tags: latest
+      addPipelineData: false
+      addBaseImageData: false      
 
   - task: PublishTestResults@2
     displayName: 'Resultados'
