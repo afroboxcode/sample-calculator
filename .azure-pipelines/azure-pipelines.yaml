@@ -1,0 +1,22 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  - task: DotNetCoreCLI@2
+    displayName: Testes
+    inputs:
+      command: 'test'
+      projects: 'tests/unitTests/unitTests.csproj'
+      workingDirectory: '$(Pipeline.Workspace)'
+
+  - task: PublishTestResults@2
+    displayName: 'Resultados'
+    inputs:
+      testResultsFormat: 'XUnit'
+      testResultsFiles: '*.trx'
+      searchFolder: '$(Agent.TempDirectory)'
