@@ -3,23 +3,29 @@ on:
   pull_request:
     branches:
       - develop
-      
+
 permissions:
   checks: write
   pull-requests: write
+
 jobs:
   check-application:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        dotnet: ['8.0.200', '8.0.201']
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
-      - run: dotnet test tests/unitTests/unitTests.csproj --logger trx --results-directory test-results
+          dotnet-version: ${{ matrix.dotnet }}
+      - name: 'Executando os testes para a versão ${{ matrix.dotnet }}'
+        run: dotnet test tests/unitTests/unitTests.csproj --logger trx --results-directory test-results
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
+          check_name: 'Testes da versão ${{ matrix.dotnet }}'
           files: |
             test-results/*.trx
